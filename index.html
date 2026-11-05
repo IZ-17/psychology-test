@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Как ты воспринимаешь людей?</title>
+<style>
+:root {
+  --site-primary: #7567E8;
+  --site-secondary: #24213D;
+  --site-background: #11111B;
+  --site-on-primary: #FFFFFF;
+  --site-on-secondary: #F4F1FF;
+  --site-on-background: #F5F4FA;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+#app { min-height: 100vh; width: 100%; background-color: var(--site-background); color: var(--site-on-background); border-radius: 0; position: relative; overflow: hidden; }
+.ambient { position:absolute; inset:0; pointer-events:none; opacity:var(--site-decoration-opacity); background: radial-gradient(circle at 12% 8%, rgba(117,103,232,.22), transparent 30%), radial-gradient(circle at 90% 55%, rgba(74,181,174,.10), transparent 28%); }
+.wrap { position:relative; width:min(900px, 100%); margin:0 auto; padding: clamp(22px,5vw,54px) clamp(18px,4vw,34px) 56px; }
+.topline { display:flex; justify-content:space-between; align-items:center; gap:12px; color:#A9A5BE; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+.brand { display:flex; align-items:center; gap:9px; font-weight:700; color:#E7E3FF; }
+.dot { width:9px; height:9px; border-radius:50%; background:var(--site-primary); box-shadow:0 0 18px rgba(117,103,232,.8); }
+.hero { padding: clamp(42px,8vw,82px) 0 34px; max-width:740px; }
+.eyebrow { color:#AFA7FF; font-size:13px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; margin-bottom:18px; }
+h1,h2,h3 { font-family:var(--site-font-heading); letter-spacing:-.04em; }
+h1 { font-size:calc(clamp(38px,7vw,68px) * var(--site-heading-scale)); line-height:1.02; margin:0 0 22px; }
+.gradient { background:linear-gradient(100deg,#C8C1FF,#8DDFD2); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.lead { color:#B8B5C9; font-size:clamp(16px,2vw,19px); line-height:1.7; max-width:650px; }
+.note { display:flex; gap:12px; align-items:flex-start; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); padding:16px 18px; border-radius:calc(16px * var(--site-radius-scale)); color:#C7C3D7; font-size:14px; line-height:1.55; margin:28px 0; }
+.note b { color:#F1EEFF; }
+.btn { appearance:none; border:0; border-radius:calc(14px * var(--site-radius-scale)); padding:15px 22px; font:700 15px var(--site-font-body); cursor:pointer; background:var(--site-primary); color:var(--site-on-primary); transition:transform .18s,filter .18s; }
+.btn:hover { transform:translateY(-2px); filter:brightness(1.08); }
+.btn:focus-visible,.option:focus-visible { outline:3px solid #AFA7FF; outline-offset:3px; }
+.btn.secondary { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); color:#F2F0FA; }
+.meta { display:flex; gap:20px; flex-wrap:wrap; color:#9793AA; font-size:13px; margin-top:22px; }
+.meta span { display:flex; gap:7px; align-items:center; }
+.hidden { display:none !important; }
+.quiz-head { margin:44px 0 30px; }
+.progress-row { display:flex; justify-content:space-between; color:#AAA6BD; font-size:13px; margin-bottom:12px; }
+.track { height:6px; border-radius:20px; background:#302D43; overflow:hidden; }
+.fill { height:100%; width:0; border-radius:20px; background:linear-gradient(90deg,var(--site-primary),#79CFC3); transition:width .25s; }
+.question-card { background:rgba(34,32,53,.86); border:1px solid rgba(255,255,255,.09); border-radius:calc(24px * var(--site-radius-scale)); padding:clamp(22px,4vw,38px); box-shadow:0 24px 70px rgba(0,0,0,.18); }
+.qtag { color:#AFA7FF; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+.question-card h2 { font-size:clamp(24px,4vw,34px); line-height:1.2; margin:14px 0 25px; }
+.options { display:grid; gap:11px; }
+.option { width:100%; display:flex; align-items:center; gap:14px; text-align:left; padding:16px; border-radius:15px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.035); color:#EAE8F3; font:500 15px/1.45 var(--site-font-body); cursor:pointer; transition:.18s; }
+.option:hover { border-color:rgba(175,167,255,.7); background:rgba(117,103,232,.12); }
+.option.selected { border-color:#9589FF; background:rgba(117,103,232,.2); box-shadow:inset 0 0 0 1px #9589FF; }
+.letter { flex:0 0 30px; width:30px; height:30px; display:grid; place-items:center; border-radius:9px; background:rgba(255,255,255,.08); color:#C7C2E4; font-size:13px; font-weight:700; }
+.option.selected .letter { background:var(--site-primary); color:white; }
+.actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:22px; }
+.small { color:#89859E; font-size:12px; line-height:1.5; }
+.result-kicker { color:#AFA7FF; font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.result-card { margin-top:28px; padding:clamp(24px,5vw,42px); border-radius:calc(26px * var(--site-radius-scale)); background:linear-gradient(145deg,#282440,#1B2935); border:1px solid rgba(255,255,255,.12); }
+.result-card h2 { font-size:clamp(30px,5vw,46px); margin:13px 0; }
+.result-desc { color:#C6C3D4; font-size:16px; line-height:1.75; }
+.pill { display:inline-flex; padding:7px 11px; border-radius:30px; background:rgba(141,223,210,.12); color:#A9E8DC; font-size:12px; font-weight:700; margin-top:12px; }
+.score-list { display:grid; gap:15px; margin:26px 0; }
+.score-item { display:grid; grid-template-columns:minmax(135px, .9fr) 2fr 42px; align-items:center; gap:12px; font-size:13px; color:#D9D6E5; }
+.score-track { height:9px; border-radius:20px; background:#38354B; overflow:hidden; }
+.score-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,#7567E8,#82D8CA); }
+.score-num { text-align:right; color:#AAA6BD; font-variant-numeric:tabular-nums; }
+.advice { border-top:1px solid rgba(255,255,255,.12); padding-top:22px; margin-top:24px; }
+.advice h3 { font-size:20px; margin:0 0 10px; }
+.advice p { color:#C6C3D4; line-height:1.7; margin:0; }
+.footer { color:#77738C; font-size:12px; line-height:1.6; margin-top:24px; }
+@media(max-width:560px) {
+  .score-item { grid-template-columns:1fr 38px; gap:7px 10px; }
+  .score-track { grid-column:1 / -1; grid-row:2; }
+  .score-num { grid-column:2; grid-row:1; }
+  .actions { align-items:stretch; }
+  .actions .btn { flex:1; }
+}
+@media (prefers-color-scheme: light) {
+ body,#app { background-color:var(--site-background); }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="ambient"></div>
+  <main class="wrap">
+
+    <div class="topline">
+      <div class="brand"><span class="dot"></span> Психология общения</div>
+      <span>Практическое занятие</span>
+    </div>
+
+    <section id="intro">
+      <div class="hero">
+        <div class="eyebrow">Интерактивный психологический опросник</div>
+        <h1>Как ты <span class="gradient">воспринимаешь</span> людей?</h1>
+        <p class="lead">
+          У каждого из нас есть свои привычные способы понимать окружающих.
+          Этот тест поможет заметить, на что ты чаще опираешься,
+          когда формируешь мнение о другом человеке.
+        </p>
+
+        <div class="note">
+          <span>✦</span>
+          <div>
+            <b>Важно:</b> здесь нет правильных или неправильных ответов.
+            Выбирай вариант, который ближе всего к твоему обычному поведению,
+            а не тот, который кажется наиболее правильным.
+          </div>
+        </div>
+
+        <button class="btn" id="start">
+          Начать тест <span aria-hidden="true">→</span>
+        </button>
+
+        <div class="meta">
+          <span>◷ Около 4–6 минут</span>
+          <span>▤ 15 ситуаций</span>
+          <span>◎ 5 шкал восприятия</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz" class="hidden" aria-live="polite">
+      <div class="quiz-head">
+        <div class="progress-row">
+          <span id="counter">Вопрос 1 из 15</span>
+          <span id="percent">7%</span>
+        </div>
+        <div class="track">
+          <div class="fill" id="progress"></div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="qtag" id="qtag">Ситуация 01</div>
+        <h2 id="question"></h2>
+        <div class="options" id="options"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn secondary" id="back">← Назад</button>
+        <span class="small" id="saved">Выбери наиболее близкий ответ</span>
+        <button class="btn" id="next" disabled>Далее →</button>
+      </div>
+    </section>
+
+    <section id="result" class="hidden">
+      <div class="hero" style="padding-bottom:10px">
+        <div class="eyebrow">Твой результат</div>
+        <h1>Твой способ <span class="gradient">видеть людей</span></h1>
+        <p class="lead">
+          Результат показывает, какие тенденции восприятия чаще проявились
+          в твоих ответах. Это повод для размышления, а не ярлык или диагноз.
+        </p>
+      </div>
+
+      <div class="result-card">
+        <div class="result-kicker">Преобладающая тенденция</div>
+        <h2 id="result-title"></h2>
+        <div class="result-desc" id="result-desc"></div>
+        <div class="pill" id="result-tag"></div>
+        <div class="score-list" id="scores"></div>
+
+        <div class="advice">
+          <h3>Что может помочь в общении</h3>
+          <p id="advice"></p>
+        </div>
+      </div>
+
+      <div class="note">
+        <span>✦</span>
+        <div>
+          <b>Как читать результат:</b> шкалы отражают условную выраженность
+          отдельных привычек восприятия в рамках этого учебного опросника.
+          В реальной жизни человек может использовать разные способы
+          в зависимости от ситуации.
+        </div>
+      </div>
+
+      <button class="btn" id="restart">Пройти ещё раз ↻</button>
+
+      <p class="footer">
+        Опросник создан для учебного обсуждения темы
+        «Эффекты межличностного восприятия».
+        Он не является стандартизированной психодиагностической методикой
+        и не предназначен для клинической оценки личности.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const scales = {
+  halo: {
+    name:'Эффект ореола',
+    short:'Ореол',
+    desc:'Ты можешь переносить общее впечатление от одного заметного качества на оценку человека в целом. Например, уверенная речь или приятная внешность иногда становятся основанием предполагать и другие положительные качества.',
+    advice:'Разделяй впечатление и факты: приятный человек не обязательно всегда надёжен, а неловкое первое поведение не отменяет достоинств. Дай отношениям время и оценивай разные поступки отдельно.'
+  },
+
+  first: {
+    name:'Эффект первичности',
+    short:'Первичность',
+    desc:'Первое впечатление может иметь для тебя особый вес. Начало знакомства помогает быстро сориентироваться, но иногда первоначальная оценка сохраняется даже тогда, когда появляются новые сведения.',
+    advice:'Время от времени пересматривай первое мнение. Спрашивай себя: «Что я узнал(а) о человеке после знакомства? Какие новые факты могут изменить мою оценку?»'
+  },
+
+  projection: {
+    name:'Эффект проекции',
+    short:'Проекция',
+    desc:'При понимании других ты можешь опираться на собственные чувства, мотивы и опыт. Это помогает сопереживать, но иногда приводит к предположению, что другой человек думает и чувствует так же, как ты.',
+    advice:'Не считай свои реакции универсальными. Вместо догадки уточняй: «Правильно ли я понял(а), что ты…?» — и оставляй собеседнику возможность объяснить свою позицию.'
+  },
+
+  stereotype: {
+    name:'Стереотипизация',
+    short:'Стереотипы',
+    desc:'При первой оценке человека ты можешь учитывать общие представления о его возрасте, профессии, группе или роли. Такие ориентиры иногда упрощают восприятие, но могут заслонять индивидуальные особенности.',
+    advice:'Проверяй обобщения на конкретных фактах. Старайся узнавать человека лично и не переносить свойства, которые приписываются группе, на каждого её участника.'
+  },
+
+  objective: {
+    name:'Осознанное восприятие',
+    short:'Осознанность',
+    desc:'В ответах заметна склонность не торопиться с выводами, учитывать обстоятельства и проверять впечатления через поступки и диалог. Это помогает видеть в собеседнике отдельную личность.',
+    advice:'Сохраняй любознательность и открытость. При этом помни, что объективность требует времени: уточняй информацию, учитывай контекст и допускай, что твоя оценка тоже может измениться.'
+  }
+};
+
+const questions = [
+
+{
+q:'На первой встрече одногруппник уверенно отвечает у доски, а после занятия спокойно помогает разобрать сложное задание. Какое впечатление у тебя складывается?',
+a:[
+['halo','Похоже, он не только хорошо разбирается в теме, но и в целом очень способный и надёжный.'],
+['projection','Я бы помог(ла), если бы хотел(а) наладить контакт, возможно, у него похожий мотив.'],
+['first','Его уверенное выступление сразу задало тон моему впечатлению.'],
+['objective','Пока я знаю о нём только несколько фактов; понаблюдаю, как он проявляет себя дальше.'],
+['stereotype','Наверное, он привык быть одним из активных и успешных студентов.']
+]},
+
+{
+q:'Ты написал(а) знакомому, предложив встретиться. Он ответил, что занят, но вечером выложил фото с другой компанией. Что ты скорее подумаешь?',
+a:[
+['projection','Если бы я так поступил(а), значит, мне было бы удобнее провести время с другой компанией; возможно, у него так же.'],
+['first','Этот отказ, скорее всего, останется у меня в памяти и повлияет на желание звать его снова.'],
+['stereotype','Возможно, у него уже сложился свой круг общения, в который он редко приглашает новых людей.'],
+['halo','Появится ощущение, что он не очень внимателен к чувствам других.'],
+['objective','Не знаю, что у него было запланировано; не стал(а) бы делать вывод по одной публикации.']
+]},
+
+{
+q:'Во время группового проекта один участник редко высказывается, но всегда сдаёт свою часть вовремя. Как ты воспринимаешь его?',
+a:[
+['first','Первые впечатления о его молчаливости всё ещё влияют на то, насколько активным я его считаю.'],
+['objective','Он может быть не самым разговорчивым, но при этом ответственным участником команды.'],
+['projection','Я иногда молчу, когда сначала хочу всё обдумать, возможно, он делает так же.'],
+['halo','Раз он не подводит команду, думаю, на него можно положиться и в других делах.'],
+['stereotype','Похоже, он из тех, кто предпочитает выполнять задачи самостоятельно, а не обсуждать их.']
+]},
+
+{
+q:'В общем чате человек ответил тебе коротко и довольно резко. Позже при встрече он общается приветливо. Как ты это объяснишь?',
+a:[
+['stereotype','Возможно, в переписке люди его круга привыкли общаться более прямо.'],
+['objective','Формат переписки мог повлиять на тон; личное общение даёт дополнительную информацию.'],
+['first','Резкий ответ всё равно будет вспоминаться, когда я снова увижу его сообщения.'],
+['projection','Я тоже могу коротко отвечать, когда занят(а), поэтому допускаю, что дело было в обстоятельствах.'],
+['halo','Раз при встрече он оказался приятным, значит, скорее всего, он вообще доброжелательный.']
+]},
+
+{
+q:'Ты знакомишься с человеком, который говорит спокойно, грамотно и уверенно. Пока вы общались всего несколько минут. Что ты о нём подумаешь?',
+a:[
+['first','Такое начало знакомства, скорее всего, станет основой моего дальнейшего впечатления.'],
+['halo','Он производит впечатление человека, который хорошо разбирается не только в разговоре, но и в других делах.'],
+['objective','Пока можно оценить только то, как он ведёт себя в этой беседе.'],
+['stereotype','Его манера общения напоминает людей, которые привыкли выступать или занимать ведущую роль.'],
+['projection','Я бы так спокойно говорил(а), если бы чувствовал(а) себя уверенно, возможно, он тоже.']
+]},
+
+{
+q:'Ты предложил(а) другу идею, а он неожиданно отнёсся к ней скептически. Обычно вы хорошо понимаете друг друга. Что ты сделаешь?',
+a:[
+['projection','Попробую представить, какие сомнения возникли бы у меня на его месте.'],
+['halo','Его реакция немного изменит моё представление о том, насколько он поддерживает меня.'],
+['objective','Спрошу, что именно его смущает: возможно, он заметил то, чего не заметил(а) я.'],
+['first','Запомню эту реакцию, и в следующий раз могу заранее ожидать от него критики.'],
+['stereotype','Возможно, на его мнение повлияли взгляды людей, с которыми он часто общается.']
+]},
+
+{
+q:'Перед совместной работой тебе говорят, что новый участник учится на одни пятёрки. Как ты представляешь его вклад в проект?',
+a:[
+['stereotype','Предположу, что он привык быть ответственным за результат и может взять на себя сложную часть.'],
+['objective','Дождусь распределения задач и посмотрю, как он работает именно в нашей команде.'],
+['halo','Если он хорошо учится, вероятно, он и организованный, и внимательный, и дисциплинированный.'],
+['projection','Я бы старался(ась) хорошо учиться ради будущих возможностей, возможно, у него похожая мотивация.'],
+['first','Эта характеристика заранее сформирует ожидания от него ещё до начала работы.']
+]},
+
+{
+q:'В очереди незнакомый человек пропускает вперёд родителя с маленьким ребёнком. Как ты воспринимаешь этот поступок?',
+a:[
+['objective','Это внимательный поступок, но о характере человека в целом он пока мало говорит.'],
+['first','Такой жест сразу оставит у меня приятное первое впечатление.'],
+['projection','Я бы сделал(а) так из уважения к человеку с ребёнком, вероятно, он руководствовался тем же.'],
+['stereotype','Возможно, он придерживается традиционных представлений о взаимопомощи и вежливости.'],
+['halo','Кажется, он очень чуткий и заботливый человек во всех отношениях.']
+]},
+
+{
+q:'Новый знакомый увлекается занятием, которое тебе кажется скучным или непонятным. Как ты реагируешь?',
+a:[
+['projection','Пытаюсь представить, что могло бы заинтересовать меня в этом занятии, и через это понять его увлечение.'],
+['first','Необычное для меня увлечение может повлиять на первое впечатление о нём.'],
+['objective','Спрашиваю, что именно ему нравится, не пытаясь сразу оценить это со своей стороны.'],
+['halo','Если он так увлечён своим делом, возможно, он вообще очень целеустремлённый.'],
+['stereotype','У меня возникают определённые ожидания о людях, которым нравится такое занятие.']
+]},
+
+{
+q:'Во время обсуждения человек резко перебил собеседника, но позже извинился и дал ему договорить. Как ты оценишь ситуацию?',
+a:[
+['halo','То, что он извинился, говорит мне о том, что он в целом тактичный человек.'],
+['stereotype','Возможно, он привык к более энергичному стилю общения, где люди часто перебивают друг друга.'],
+['objective','Учту и сам эпизод, и то, как он отреагировал после замечания.'],
+['first','Момент, когда он перебил собеседника, всё равно останется наиболее заметным.'],
+['projection','Я тоже могу перебить кого-то, если сильно увлечён(а) разговором, поэтому понимаю такую реакцию.']
+]},
+
+{
+q:'Ты видишь профиль человека, который часто публикует фотографии поездок, мероприятий и покупок. Какое впечатление может возникнуть?',
+a:[
+['first','Такой образ быстро формирует первое представление, даже если я ещё не знаком(а) с человеком.'],
+['projection','Я бы делился(ась) такими фото, чтобы сохранить впечатления или показать важные моменты; предполагаю похожую причину.'],
+['halo','Кажется, он активный, успешный и умеет интересно организовывать свою жизнь.'],
+['objective','Соцсети показывают выбранные моменты, поэтому я не стал(а) бы судить о человеке по профилю.'],
+['stereotype','По таким публикациям легко отнести его к определённому образу жизни или социальной среде.']
+]},
+
+{
+q:'Перед началом проекта тебе рассказывают, что один из участников раньше не выполнил обещанную часть работы. Сейчас он предлагает взять важную задачу. Как поступишь?',
+a:[
+['first','История о прошлом случае будет влиять на моё доверие к нему, даже если сейчас он настроен серьёзно.'],
+['objective','Обсужу сроки и конкретные шаги, а затем буду оценивать по тому, как он выполняет договорённости.'],
+['halo','Раз он сам вызвался, возможно, он на самом деле очень ответственный и хочет исправить прошлую ошибку.'],
+['projection','Я бы предложил(а) задачу, если бы хотел(а) показать, что мне можно доверять; возможно, он думает так же.'],
+['stereotype','Может быть, в его прежней команде было принято распределять обязанности менее строго.']
+]},
+
+{
+q:'На большом мероприятии человек почти не участвует в общих разговорах. Позже вы случайно оказываетесь вдвоём и долго интересно беседуете. Как изменится твоё мнение?',
+a:[
+['stereotype','Возможно, ему просто не подходит формат шумных компаний, но комфортнее в небольшом кругу.'],
+['halo','После приятного разговора я могу начать считать его интересным и открытым человеком вообще.'],
+['objective','Похоже, его поведение зависит от ситуации; теперь у меня есть больше одного наблюдения.'],
+['first','Первое впечатление о его отстранённости всё ещё будет немного влиять на меня.'],
+['projection','Мне самому/самой проще общаться один на один, поэтому я предполагаю, что ему тоже так удобнее.']
+]},
+
+{
+q:'Ты узнаёшь, что человек, который раньше казался тебе несерьёзным, самостоятельно организовал сложное мероприятие. Что ты подумаешь?',
+a:[
+['halo','Значит, я недооценивал(а) его: вероятно, он способен хорошо справляться со многими задачами.'],
+['projection','Я бы взялся(ась) за такое дело, если бы хотел(а) доказать свою самостоятельность; возможно, у него похожий мотив.'],
+['first','Мне будет непросто отказаться от прежнего впечатления, хотя этот случай заставит задуматься.'],
+['objective','Пересмотрю оценку: прежнее впечатление не учитывало эту сторону его поведения.'],
+['stereotype','Возможно, в привычной ему среде он занимает более ответственную роль, чем я предполагал(а).']
+]},
+
+{
+q:'Тебе нужно выбрать человека для совместной задачи, но вы почти не знакомы. На что ты в первую очередь обратишь внимание?',
+a:[
+['objective','На то, как человек объясняет свои идеи, слушает других и договаривается о конкретных действиях.'],
+['halo','На наиболее заметное качество: например, уверенность, общительность или собранность.'],
+['stereotype','На его опыт, роль в группе и то, что обычно ожидают от людей с таким опытом.'],
+['projection','На то, насколько его подход похож на мой и насколько легко мне представить себя на его месте.'],
+['first','На первые минуты общения и то ощущение, которое возникло в самом начале.']
+]}
+];
+
+let index = 0;
+let answers = Array(questions.length).fill(null);
+
+const $ = id => document.getElementById(id);
+
+function showQuestion() {
+  const q = questions[index];
+
+  $('counter').textContent = `Вопрос ${index+1} из ${questions.length}`;
+  $('percent').textContent = `${Math.round((index+1)/questions.length*100)}%`;
+  $('progress').style.width = `${(index+1)/questions.length*100}%`;
+  $('qtag').textContent = `Ситуация ${String(index+1).padStart(2,'0')}`;
+  $('question').textContent = q.q;
+  $('options').innerHTML = '';
+
+  const letters = ['A','B','C','D','E'];
+
+  q.a.forEach((item,i) => {
+    const b = document.createElement('button');
+
+    b.className = 'option' + (answers[index] === item[0] ? ' selected' : '');
+    b.type = 'button';
+    b.innerHTML = `<span class="letter">${letters[i]}</span><span></span>`;
+    b.querySelector('span:last-child').textContent = item[1];
+
+    b.addEventListener('click', () => {
+      answers[index] = item[0];
+      showQuestion();
+    });
+
+    $('options').appendChild(b);
+  });
+
+  $('back').disabled = index === 0;
+  $('back').style.opacity = index === 0 ? '.4' : '1';
+  $('next').disabled = !answers[index];
+
+  $('next').textContent =
+    index === questions.length-1
+      ? 'Узнать результат →'
+      : 'Далее →';
+
+  $('saved').textContent =
+    answers[index]
+      ? 'Ответ выбран'
+      : 'Выбери наиболее близкий ответ';
+}
+
+function finish() {
+  const scores = {
+    halo:0,
+    first:0,
+    projection:0,
+    stereotype:0,
+    objective:0
+  };
+
+  answers.forEach(a => scores[a]++);
+
+  const max = Math.max(...Object.values(scores));
+
+  const winners = Object.keys(scores).filter(
+    k => scores[k] === max
+  );
+
+  const primary = winners[0];
+
+  $('result-title').textContent =
+    winners.length === 1
+      ? scales[primary].name
+      : 'Смешанный профиль';
+
+  $('result-desc').textContent =
+    winners.length === 1
+      ? scales[primary].desc
+      : 'У тебя проявились сразу несколько равных тенденций. Это нормально: восприятие зависит от человека и ситуации. Посмотри на шкалы ниже — они показывают, какие способы оценки людей у тебя выражены сильнее.';
+
+  $('result-tag').textContent =
+    winners.length === 1
+      ? 'Наиболее выраженная тенденция'
+      : `Ведущих тенденций: ${winners.length}`;
+
+  $('advice').textContent =
+    winners.length === 1
+      ? scales[primary].advice
+      : 'Сочетай сильные стороны этих подходов: замечай первое впечатление, но проверяй его фактами; учитывай собственный опыт, но уточняй чувства собеседника; избегай поспешных обобщений.';
+
+  const order = Object.keys(scores).sort(
+    (a,b) => scores[b] - scores[a]
+  );
+
+  $('scores').innerHTML = '';
+
+  order.forEach(k => {
+    const row = document.createElement('div');
+    row.className = 'score-item';
+
+    const pct = scores[k] / questions.length * 100;
+
+    row.innerHTML = `
+      <span>${scales[k].name}</span>
+      <div class="score-track">
+        <div class="score-fill" style="width:${pct}%"></div>
+      </div>
+      <span class="score-num">${scores[k]}/15</span>
+    `;
+
+    $('scores').appendChild(row);
+  });
+
+  $('quiz').classList.add('hidden');
+  $('result').classList.remove('hidden');
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+}
+
+$('start').addEventListener('click', () => {
+  $('intro').classList.add('hidden');
+  $('quiz').classList.remove('hidden');
+
+  showQuestion();
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+});
+
+$('back').addEventListener('click', () => {
+  if (index > 0) {
+    index--;
+    showQuestion();
+  }
+});
+
+$('next').addEventListener('click', () => {
+  if (!answers[index]) return;
+
+  if (index < questions.length-1) {
+    index++;
+    showQuestion();
+  } else {
+    finish();
+  }
+});
+
+$('restart').addEventListener('click', () => {
+  index = 0;
+  answers = Array(questions.length).fill(null);
+
+  $('result').classList.add('hidden');
+  $('intro').classList.remove('hidden');
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+});
+</script>
+</body>
+</html>
